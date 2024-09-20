@@ -1,6 +1,7 @@
 // src/components/AppleMusicLink.jsx
 import React from 'react';
 // import { FiApple } from 'react-icons/fi';
+const developerToken = process.env.REACT_APP_DEVELOPER_TOKEN;
 
 
 
