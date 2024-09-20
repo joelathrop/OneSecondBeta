@@ -1,16 +1,24 @@
 // src/components/AppleMusicLink.jsx
 import React from 'react';
+import { useMusic } from '../MusicContext';
 // import { FiApple } from 'react-icons/fi';
-const developerToken = process.env.REACT_APP_DEVELOPER_TOKEN;
-
-
-
 
 const AppleMusicLink = () => {
+  const music = useMusic();
 
   const handleAuthorize = () => {
+    if (!music) {
+      console.error('not initialized');
+    }
     console.log('here');
-  }
+
+    music.authorize().then((musicUserToken) => {
+      MUT = musicUserToken;
+      console.log(MUT);
+    }).catch((error) => {
+      console.error('Authorization Error: ', error);
+    });
+  };
 
 
   return (
