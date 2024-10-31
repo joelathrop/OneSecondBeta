@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { MusicProvider } from './MusicContext';
+import { MusicProvider } from './utils/MusicContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Playlist from './pages/Playlist';

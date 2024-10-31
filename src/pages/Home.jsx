@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import AuthorizeLink from '../components/AuthorizeLink';
-import { useMusic } from '../MusicContext';
+import { useMusic } from '../utils/MusicContext';
 import { useNavigate } from 'react-router-dom';
 import Playlist from './Playlist';
 
 const Home = () => {
-  const music = useMusic();
-  var [MUT, setMUT] = useState(undefined);
+  const { musicKitInstance, setMUT, MUT } = useMusic();
   const navigate = useNavigate();
 
   // Smooth scroll to the next section
@@ -27,7 +26,7 @@ const Home = () => {
 
   // handle user logout
   const handleUnauthorize = () => {
-    music.unauthorize();
+    musicKitInstance.unauthorize();
     setMUT(undefined);
     console.log("User Unauthorized.");
   }
