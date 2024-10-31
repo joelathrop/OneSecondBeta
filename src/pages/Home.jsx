@@ -1,22 +1,66 @@
-import React from 'react';
-import AppleMusicLink from '../components/AppleMusicLink';
+import React, { useState } from 'react';
+import AuthorizeLink from '../components/AuthorizeLink';
+import { useMusic } from '../MusicContext';
+import { useNavigate } from 'react-router-dom';
+import Playlist from './Playlist';
 
 const Home = () => {
+  const music = useMusic();
+  var [MUT, setMUT] = useState(undefined);
+  const navigate = useNavigate();
+
   // Smooth scroll to the next section
   const scrollToNextSection = () => {
     const nextSection = document.getElementById('about-section');
     nextSection.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // check if user is authorized (MUT is set)
+  const isAuthorized = () => {
+    return MUT !== undefined;
+  }
+
+  // authorize callback
+  const handleAuthorize = (musicUserToken) => {
+    setMUT(musicUserToken);
+  }
+
+  // handle user logout
+  const handleUnauthorize = () => {
+    music.unauthorize();
+    setMUT(undefined);
+    console.log("User Unauthorized.");
+  }
+
   return (
     <div className="relative">
       {/* First Section (Welcome Section) */}
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 pt-20 relative">
-        <h1 className="text-5xl font-bold text-white mb-6">Welcome to MyMusicApp</h1>
+        <h1 className="text-5xl font-bold text-white mb-6">Welcome to OneSecond</h1>
         <p className="text-lg text-gray-200 mb-8">
           Connect your Apple Music and enjoy your favorite tunes seamlessly.
         </p>
-        <AppleMusicLink />
+
+        {!isAuthorized() ? (
+          <AuthorizeLink onAuthorize={handleAuthorize}/>
+        ) : (
+          <div className="flex flex-col items-center">
+            <button 
+              id="playWithPlaylistButton" 
+              className="flex items-center justify-center px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition"
+              onClick={() => navigate('/playlist')}
+            >
+              <span className="text-lg">Pick a Playlist</span>
+            </button>
+            <button 
+              id="unauthorizeButton" 
+              className="flex items-center justify-center px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition"
+              onClick={handleUnauthorize}
+            >
+              <span className="text-lg">Log Out</span>
+            </button>
+          </div>
+        )}
 
         {/* Scroll Arrow Indicator */}
         <div className="absolute bottom-8 flex justify-center">

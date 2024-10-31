@@ -12,7 +12,7 @@ const Navbar = () => {
 
   const menuItems = [
     { name: 'Home', icon: <FiHome />, path: '/' },
-    { name: 'Music', icon: <FiMusic />, path: '/music' },
+    { name: 'Play With a Playlist', icon: <FiMusic />, path: '/playlist' },
     { name: 'Profile', icon: <FiUser />, path: '/profile' },
     { name: 'Settings', icon: <FiSettings />, path: '/settings' },
   ];
