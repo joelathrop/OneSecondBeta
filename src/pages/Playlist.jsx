@@ -10,22 +10,50 @@ const Playlist = () => {
   const MUT = Home.MUT;
   const playlistsURL = 'https://api.music.apple.com/v1/me/library/playlists?limit=100';
 
+  let allPlaylists = [];
+
+
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  const fetchPlaylistsPage = (searchQuery) => {
-    // fetch playlists
+  const fetchPlaylists = (music) => {
+    
+    // checking user authentication
+    if (!MUT) {
+      console.error('MUT is undefined');
+      return;
+    }
+
+    // call pagination fetch
+    console.log('fetching playlists');
+    allPlaylists = [];
+  }
+
+  const fetchPlaylistsPage = (nextUrl) => {
     fetch(playlistsURL, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${developerToken}`,
         'Music-User-Token': MUT
       }
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response not ok');
+      }
+      return response.json();
+    }).then(data => {
+      allPlaylists.push(...data.data);
+      if (data.next) {
+        fetchPlaylists(data.next);
+      } else {
+        console.log('Number of playlists: ' + allPlaylists.length);
+        // call displayitems
+      }
+    }).catch(error => {
+      console.error('Error fetching playlists: ', error);
     })
   }
-  fetchPlaylistsPage
-
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 pt-20 relative">
