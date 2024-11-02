@@ -1,8 +1,9 @@
 // src/pages/Music.jsx
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useMusic } from '../utils/MusicContext';
 import '../App';
 import { useNavigate } from 'react-router-dom';
+import { GiConsoleController } from 'react-icons/gi';
 // import AuthorizeLink from '../components/AuthorizeLink';
 
 const Playlist = () => {
@@ -10,7 +11,9 @@ const Playlist = () => {
   const { MUT, setAllPlaylists, allPlaylists, selectedPlaylistId, setSelectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks } = useMusic();
   const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
   const playlistsURL = 'https://api.music.apple.com/v1/me/library/playlists?limit=100';
+  const offsetRef = useRef(0);
   const navigate = useNavigate();
+  const [play, setPlay] = useState(false);
   // const [selectedPlaylistId, setSelectedPlaylistId] = useState('');
 
   // mount playlists route
@@ -24,12 +27,14 @@ const Playlist = () => {
     }
   }, [MUT]);
 
-  // playlist songs callback
+  /**
+   * Callback for selecting a playlist
+   */
   useEffect(() => {
-    console.log('Selected playlist id: ', selectedPlaylistId);
+    // console.log('Selected playlist id: ', selectedPlaylistId);
     console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
     console.log(selectedPlaylistTracks);
-  }, [selectedPlaylistId, selectedPlaylistTracks]);
+  }, [selectedPlaylistTracks, selectedPlaylistId]);
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -100,9 +105,9 @@ const Playlist = () => {
   }
 
   const fetchPlaylistSongsPage = (url) => {
-    // reset playlist arrays
-    setSelectedPlaylistTracks([]);
-    fetch(url, {
+    // reset playlist arrays ?? can't do this because this is recursive
+    // setSelectedPlaylistTracks([]);
+    fetch(`${url}?offset=${offsetRef.current}`, {
       method: 'GET',
         headers: {
             'Authorization': `Bearer ${developerToken}`,
@@ -116,16 +121,15 @@ const Playlist = () => {
       return response.json();
     })
     .then(data => {
-      if (data.data.length <= 100) {  // TODO: There's gotta be a better way to do this but how
-          setSelectedPlaylistTracks(prevPlaylistTracks => [...prevPlaylistTracks, ...data.data]);
-          fetchPlaylistSongsPage(`https://api.music.apple.com/v1/me/library/playlists/${selectedPlaylistId}/tracks?offset=${offset}`);
-          offset += 100;
-          console.log('offset' + offset);
+      setSelectedPlaylistTracks(prevTracks => [...prevTracks, ...data.data]);
 
+      if (data.data.length === 100) {
+        offsetRef.current += 100;
+        fetchPlaylistSongsPage(url);
+      } else {
+        offsetRef.current = 0;
+        navigate('/game');
       }
-      //  else {
-      //     console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
-      // }
     })
     .catch(error => {
         console.log('Error fetching playlist songs; may have reached end of playlist pagination:', error);
@@ -155,10 +159,7 @@ const Playlist = () => {
           className="button is-small is-focused is-dark is-link"
           onClick={() => {
             setSelectedPlaylistId(playlist.id); 
-            fetchPlaylistSongs(playlist.id); 
-            // console.log('playlist id: ', selectedPlaylistId);
-            // console.log('total tracks in playlist again', selectedPlaylistTracks.length);
-            // navigate('/game');
+            fetchPlaylistSongs(playlist.id);
           }}
           style={{ padding: '8px 12px', textAlign: 'center' }}
         >
