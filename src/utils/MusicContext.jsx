@@ -4,6 +4,10 @@ const MusicContext = createContext();
 
 export const MusicProvider = ({ children }) => {
     const [musicKitInstance, setMusicKitInstance] = useState(null);
+    const [MUT, setMUT] = useState(localStorage.getItem('MUT') || null);
+    const [allPlaylists, setAllPlaylists] = useState([]);
+    const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
+    const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
     const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
   
     useEffect(() => {
@@ -34,7 +38,9 @@ export const MusicProvider = ({ children }) => {
     }, [musicKitInstance]);
 
     return (
-        <MusicContext.Provider value={musicKitInstance}>
+        // Set things in here that you want to be able to get across pages
+        <MusicContext.Provider value={{ musicKitInstance, MUT, setMUT, allPlaylists, 
+            setAllPlaylists, setSelectedPlaylistId, selectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks }}>
             {children}
         </MusicContext.Provider>
     );

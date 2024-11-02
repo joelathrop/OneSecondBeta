@@ -1,33 +1,36 @@
 import React from 'react';
-import { useMusic } from '../MusicContext';
+import { useMusic } from '../utils/MusicContext';
 // import { FiApple } from 'react-icons/fi';
 
-const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
-var MUT = "";
-
 const AuthorizeLink = ({ onAuthorize }) => {
-  const music = useMusic();
+  const { musicKitInstance, setMUT, MUT } = useMusic();
 
   const handleAuthorize = () => {
-    if (!music || typeof music.authorize !== 'function') {
+    if (!musicKitInstance || typeof musicKitInstance.authorize !== 'function') {
       console.error('not initialized');
       return;
     }
 
     console.log('MusicKit initialized, proceeding with authorization');
 
-    if (music.isAuthorized) {
+    if (musicKitInstance.isAuthorized) {
       console.log("its authorized");
     }
 
-    music.authorize()
-    .then((musicUserToken) => {
-      MUT = musicUserToken;
-      onAuthorize(musicUserToken);
-      // console.log(MUT);
-    }).catch((error) => {
-      console.error('Authorization Error: ', error);
-    });
+    if (MUT) {
+      musicKitInstance.setMUT(MUT);
+      console.log('MUT loaded from session');
+    } else {
+      musicKitInstance.authorize()
+      .then((musicUserToken) => {-
+        setMUT(musicUserToken);
+        localStorage.setItem('MUT', musicUserToken);
+        onAuthorize(musicUserToken);
+        // console.log(MUT);
+      }).catch((error) => {
+        console.error('Authorization Error: ', error);
+      });
+    }
 
   };
 
@@ -46,8 +49,8 @@ const AuthorizeLink = ({ onAuthorize }) => {
   );
 };
 
-export const getMUT = () => {
-  return MUT;
-}
+// export const getMUT = () => {
+//   return MUT;
+// }
 
 export default AuthorizeLink;

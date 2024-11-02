@@ -1,12 +1,17 @@
 import React, { useState } from 'react';
 import AuthorizeLink from '../components/AuthorizeLink';
-import { useMusic } from '../MusicContext';
+import { useMusic } from '../utils/MusicContext';
 import { useNavigate } from 'react-router-dom';
 import Playlist from './Playlist';
 
+/////////////////////////
+//////// TODOS //////////
+/////////////////////////
+// set everything back to session storage?
+// easter eggs when users route to places they can't get to?
+
 const Home = () => {
-  const music = useMusic();
-  var [MUT, setMUT] = useState(undefined);
+  const { musicKitInstance, setMUT, MUT } = useMusic();
   const navigate = useNavigate();
 
   // Smooth scroll to the next section
@@ -27,8 +32,9 @@ const Home = () => {
 
   // handle user logout
   const handleUnauthorize = () => {
-    music.unauthorize();
-    setMUT(undefined);
+    musicKitInstance.unauthorize();
+    localStorage.removeItem('MUT');
+    setMUT(undefined);    // should it be 'null'? if so need to also change isAuthorized
     console.log("User Unauthorized.");
   }
 
