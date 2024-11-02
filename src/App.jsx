@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Playlist from './pages/Playlist';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
+import Game from './pages/Game';
 
 // const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
 
@@ -22,6 +23,7 @@ const App = () => {
             <Route path="/playlist" element={<Playlist />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/game" element={<Game />} />
             {/* Add more routes as needed */}
           </Routes>
         </div>

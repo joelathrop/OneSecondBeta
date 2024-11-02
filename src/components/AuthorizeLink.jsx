@@ -3,7 +3,7 @@ import { useMusic } from '../utils/MusicContext';
 // import { FiApple } from 'react-icons/fi';
 
 const AuthorizeLink = ({ onAuthorize }) => {
-  const { musicKitInstance, setMUT } = useMusic();
+  const { musicKitInstance, setMUT, MUT } = useMusic();
 
   const handleAuthorize = () => {
     if (!musicKitInstance || typeof musicKitInstance.authorize !== 'function') {
@@ -17,14 +17,20 @@ const AuthorizeLink = ({ onAuthorize }) => {
       console.log("its authorized");
     }
 
-    musicKitInstance.authorize()
-    .then((musicUserToken) => {
-      setMUT(musicUserToken);
-      onAuthorize(musicUserToken);
-      // console.log(MUT);
-    }).catch((error) => {
-      console.error('Authorization Error: ', error);
-    });
+    if (MUT) {
+      musicKitInstance.setMUT(MUT);
+      console.log('MUT loaded from session');
+    } else {
+      musicKitInstance.authorize()
+      .then((musicUserToken) => {-
+        setMUT(musicUserToken);
+        localStorage.setItem('MUT', musicUserToken);
+        onAuthorize(musicUserToken);
+        // console.log(MUT);
+      }).catch((error) => {
+        console.error('Authorization Error: ', error);
+      });
+    }
 
   };
 

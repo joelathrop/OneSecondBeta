@@ -1,16 +1,17 @@
 // src/pages/Music.jsx
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { useMusic } from '../utils/MusicContext';
-import AuthorizeLink from '../components/AuthorizeLink';
+import '../App';
+import { useNavigate } from 'react-router-dom';
+// import AuthorizeLink from '../components/AuthorizeLink';
 
 const Playlist = () => {
   const[searchQuery, setSearchQuery] = useState('');
-  const {music, setMUT, MUT, setAllPlaylists, allPlaylists } = useMusic();
+  const { MUT, setAllPlaylists, allPlaylists, selectedPlaylistId, setSelectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks } = useMusic();
   const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
   const playlistsURL = 'https://api.music.apple.com/v1/me/library/playlists?limit=100';
-
-  // let [allPlaylists, setAllPlaylists] = useState([]);
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState('');
+  const navigate = useNavigate();
+  // const [selectedPlaylistId, setSelectedPlaylistId] = useState('');
 
   // mount playlists route
   useEffect (() => {
@@ -19,13 +20,24 @@ const Playlist = () => {
     fetchPlaylists();
 
     return () => {
-      console.log('unmounted...?');
+      console.log('unmounted playlist');
     }
   }, [MUT]);
+
+  // playlist songs callback
+  useEffect(() => {
+    console.log('Selected playlist id: ', selectedPlaylistId);
+    console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
+    console.log(selectedPlaylistTracks);
+  }, [selectedPlaylistId, selectedPlaylistTracks]);
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
+
+  const filteredPlaylists = allPlaylists.filter(playlist =>
+    playlist.attributes?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const fetchPlaylists = () => {
     
@@ -42,6 +54,11 @@ const Playlist = () => {
     fetchPlaylistsPage(playlistsURL);
   }
 
+  /**
+   * Fetches next page of playlists
+   * 
+   * @param {nextUrl} nextUrl 
+   */
   const fetchPlaylistsPage = (nextUrl) => {
     console.log('dev token', developerToken);
     console.log('MUT: ', MUT);
@@ -60,44 +77,67 @@ const Playlist = () => {
       return response.json();
     })
     .then(data => {
-      // allPlaylists.push(...data.data);
-      setAllPlaylists(prevPlaylists => [...prevPlaylists, ...data.data]);
-      if (data.next) {
-        fetchPlaylists(data.next);
-      } else {
-        console.log('Number of playlists: ' + allPlaylists.length);
-        // call displayitems
-        displayItems(allPlaylists);
-      }
+      setAllPlaylists(prevPlaylists => {
+        const updatedPlaylists = [...prevPlaylists, ...data.data]
+
+        console.log('# of playlists: ', updatedPlaylists.length);
+
+        // fetch next page
+        if (data.next) {
+          fetchPlaylists(data.next);
+        }
+        return updatedPlaylists;
+      });
     })
     .catch(error => {
       console.error('Error fetching playlists: ', error);
     })
   }
 
-  function displayItems(items) {
-    const itemList = document.getElementById('itemList');
-    itemList.innerHTML = '';
+  const fetchPlaylistSongs = (playlistId) => {
+    const url = `https://api.music.apple.com/v1/me/library/playlists/${playlistId}/tracks`;
+    fetchPlaylistSongsPage(url);
+  }
 
-    items.forEach(playlist => {
-      const playlistButton = document.createElement('playlistButton');
+  const fetchPlaylistSongsPage = (url) => {
+    // reset playlist arrays
+    setSelectedPlaylistTracks([]);
+    fetch(url, {
+      method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${developerToken}`,
+            'Music-User-Token': MUT
+        }
+    })
+    .then(response => {
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.data.length <= 100) {  // TODO: There's gotta be a better way to do this but how
+          setSelectedPlaylistTracks(prevPlaylistTracks => [...prevPlaylistTracks, ...data.data]);
+          fetchPlaylistSongsPage(`https://api.music.apple.com/v1/me/library/playlists/${selectedPlaylistId}/tracks?offset=${offset}`);
+          offset += 100;
+          console.log('offset' + offset);
 
-      playlistButton.textContent = item.attributes.name;
-      playlistButton.setAttribute('data-id', item.id);
-      playlistButton.classList.add('button', 'is-small', 'is-focused', 'is-dark', 'is-link');
-      playlistButton.addEventListener('click', () => {
-        setSelectedPlaylistId(playlist.id);
-        itemList.innerHTML = '';
-
-        // route?
-      });
-      itemList.appendChild(playlistButton);
+      }
+      //  else {
+      //     console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
+      // }
+    })
+    .catch(error => {
+        console.log('Error fetching playlist songs; may have reached end of playlist pagination:', error);
+        // console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
     });
   }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 pt-20 relative">
       <h2 className="text-3xl font-semibold">Play with a Playlist</h2>
+
+      {/* Search Bar */}
       <input 
         type="text"
         placeholder='Search for a playlist...'
@@ -105,11 +145,27 @@ const Playlist = () => {
         onChange={handleInputChange}
         className='border border-gray-300 rounded p-2 mr-2'
       />
-      <section className="section">
-        <div className="container">
-          <ul id="itemList" className="mt-4"></ul>
-        </div>
-      </section>
+
+      {/* Playlist Buttons */}
+      <div id="itemList" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+        {filteredPlaylists.map((playlist) => (
+          <button
+          key={playlist.id}
+          data-id={playlist.id}
+          className="button is-small is-focused is-dark is-link"
+          onClick={() => {
+            setSelectedPlaylistId(playlist.id); 
+            fetchPlaylistSongs(playlist.id); 
+            // console.log('playlist id: ', selectedPlaylistId);
+            // console.log('total tracks in playlist again', selectedPlaylistTracks.length);
+            // navigate('/game');
+          }}
+          style={{ padding: '8px 12px', textAlign: 'center' }}
+        >
+          {playlist.attributes.name}
+        </button>
+        ))}
+      </div>
     </div>
   );
 };

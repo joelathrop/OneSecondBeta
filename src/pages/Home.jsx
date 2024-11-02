@@ -4,6 +4,12 @@ import { useMusic } from '../utils/MusicContext';
 import { useNavigate } from 'react-router-dom';
 import Playlist from './Playlist';
 
+/////////////////////////
+//////// TODOS //////////
+/////////////////////////
+// set everything back to session storage?
+// easter eggs when users route to places they can't get to?
+
 const Home = () => {
   const { musicKitInstance, setMUT, MUT } = useMusic();
   const navigate = useNavigate();
@@ -27,7 +33,8 @@ const Home = () => {
   // handle user logout
   const handleUnauthorize = () => {
     musicKitInstance.unauthorize();
-    setMUT(undefined);
+    localStorage.removeItem('MUT');
+    setMUT(undefined);    // should it be 'null'? if so need to also change isAuthorized
     console.log("User Unauthorized.");
   }
 
