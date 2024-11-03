@@ -20,6 +20,7 @@ const Playlist = () => {
   useEffect (() => {
     console.log('navigated to playlists page');
 
+    setSelectedPlaylistTracks([]);
     fetchPlaylists();
 
     return () => {
@@ -32,14 +33,21 @@ const Playlist = () => {
    */
   useEffect(() => {
     // console.log('Selected playlist id: ', selectedPlaylistId);
-    console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
-    console.log(selectedPlaylistTracks);
+    // console.log('Total tracks in the playlist:', selectedPlaylistTracks.length);
+    // console.log(selectedPlaylistTracks);
   }, [selectedPlaylistTracks, selectedPlaylistId]);
 
+  /**
+   * Changes searchQuery variable to what's in the search bar
+   * @param {event} event 
+   */
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
+  /**
+   * Filters the playlists based on search query
+   */
   const filteredPlaylists = allPlaylists.filter(playlist =>
     playlist.attributes?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -65,8 +73,8 @@ const Playlist = () => {
    * @param {nextUrl} nextUrl 
    */
   const fetchPlaylistsPage = (nextUrl) => {
-    console.log('dev token', developerToken);
-    console.log('MUT: ', MUT);
+    // console.log('dev token', developerToken);
+    // console.log('MUT: ', MUT);
 
     fetch(nextUrl, {
       method: 'GET',
@@ -84,8 +92,6 @@ const Playlist = () => {
     .then(data => {
       setAllPlaylists(prevPlaylists => {
         const updatedPlaylists = [...prevPlaylists, ...data.data]
-
-        console.log('# of playlists: ', updatedPlaylists.length);
 
         // fetch next page
         if (data.next) {

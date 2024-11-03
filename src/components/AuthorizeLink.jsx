@@ -13,20 +13,19 @@ const AuthorizeLink = ({ onAuthorize }) => {
 
     console.log('MusicKit initialized, proceeding with authorization');
 
-    if (musicKitInstance.isAuthorized) {
-      console.log("its authorized");
-    }
+    // if (musicKitInstance.isAuthorized) {
+    //   console.log("its authorized");
+    // }
 
     if (MUT) {
       musicKitInstance.setMUT(MUT);
       console.log('MUT loaded from session');
     } else {
       musicKitInstance.authorize()
-      .then((musicUserToken) => {-
+      .then((musicUserToken) => {
         setMUT(musicUserToken);
         localStorage.setItem('MUT', musicUserToken);
         onAuthorize(musicUserToken);
-        // console.log(MUT);
       }).catch((error) => {
         console.error('Authorization Error: ', error);
       });

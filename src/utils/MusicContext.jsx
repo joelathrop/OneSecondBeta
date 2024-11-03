@@ -8,6 +8,7 @@ export const MusicProvider = ({ children }) => {
     const [allPlaylists, setAllPlaylists] = useState([]);
     const [selectedPlaylistId, setSelectedPlaylistId] = useState(null);
     const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
+    const [gameMode, setGameMode] = useState(0);        // 1 FOR NORMAL, 2 FOR CHALLENGE
     const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
   
     useEffect(() => {
@@ -26,7 +27,7 @@ export const MusicProvider = ({ children }) => {
             if (!music) {
                 console.log("Error initializing MusicKit Instance");
             } else {
-                console.log('Successfully initialized MusicKit', music);
+                console.log('Successfully initialized MusicKit');
             }
         }
 
@@ -34,13 +35,13 @@ export const MusicProvider = ({ children }) => {
     }, [developerToken]);
 
     useEffect(() => {
-        console.log('MusicKit instance:', musicKitInstance);
+        // console.log('MusicKit instance:', musicKitInstance);
     }, [musicKitInstance]);
 
     return (
         // Set things in here that you want to be able to get across pages
         <MusicContext.Provider value={{ musicKitInstance, MUT, setMUT, allPlaylists, 
-            setAllPlaylists, setSelectedPlaylistId, selectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks }}>
+            setAllPlaylists, setSelectedPlaylistId, selectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks, gameMode, setGameMode }}>
             {children}
         </MusicContext.Provider>
     );

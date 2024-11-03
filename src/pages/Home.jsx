@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import AuthorizeLink from '../components/AuthorizeLink';
 import { useMusic } from '../utils/MusicContext';
 import { useNavigate } from 'react-router-dom';
-import Playlist from './Playlist';
 
 /////////////////////////
 //////// TODOS //////////
@@ -11,7 +10,7 @@ import Playlist from './Playlist';
 // easter eggs when users route to places they can't get to?
 
 const Home = () => {
-  const { musicKitInstance, setMUT, MUT } = useMusic();
+  const { musicKitInstance, setMUT, MUT, gameMode, setGameMode } = useMusic();
   const navigate = useNavigate();
 
   // Smooth scroll to the next section
@@ -51,18 +50,38 @@ const Home = () => {
           <AuthorizeLink onAuthorize={handleAuthorize}/>
         ) : (
           <div className="flex flex-col items-center">
+          {/* Game Mode Buttons */}
+          <div className="flex gap-4 mb-4">
             <button 
-              id="playWithPlaylistButton" 
-              className="flex items-center justify-center px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition"
-              onClick={() => navigate('/playlist')}
+                  className={`flex items-center justify-center px-6 py-3 rounded-full shadow-lg transition ${gameMode === 1 ? 'bg-red-500' : 'bg-black text-white hover:bg-gray-800'}`}
+                  onClick={() => setGameMode(1)} // Assuming 1 is for normal mode
+              >
+                  <span className="text-lg">Normal Mode</span>
+              </button>
+              <button 
+                  className={`flex items-center justify-center px-6 py-3 rounded-full shadow-lg transition ${gameMode === 2 ? 'bg-red-500' : 'bg-black text-white hover:bg-gray-800'}`}
+                  onClick={() => setGameMode(2)} // Assuming 2 is for challenge mode
+              >
+                  <span className="text-lg">Challenge Mode</span>
+              </button>
+          </div>
+
+          {gameMode > 0 && (
+            <button 
+                id="playWithPlaylistButton" 
+                className="flex items-center justify-center px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition"
+                onClick={() => navigate('/playlist')}
             >
-              <span className="text-lg">Pick a Playlist</span>
+                <span className="text-lg">Pick a Playlist</span>
             </button>
-            <button 
+          )}
+
+          {/* Always Show Log Out Button */}
+          <button 
               id="unauthorizeButton" 
               className="flex items-center justify-center px-6 py-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition"
               onClick={handleUnauthorize}
-            >
+          >
               <span className="text-lg">Log Out</span>
             </button>
           </div>
