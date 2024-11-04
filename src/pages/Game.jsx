@@ -153,8 +153,12 @@ const Game = () => {
 
         {/* Add Time Button */}
         <button
-        onClick={addTime}
-        className="px-3 py-2 mt-3 bg-blue-700 text-white font-semibold rounded-full shadow hover:bg-blue-800 transition"
+            onClick={addTime}
+            className="flex items-center justify-center px-3 py-2 mt-3 bg-blue-700 text-white font-semibold rounded-full shadow hover:bg-blue-800 transition"
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+            }}
         >
         Add Time
         </button>
