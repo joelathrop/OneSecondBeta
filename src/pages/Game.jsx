@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 const Game = () => {
 
     // mount game
-    const { musicKitInstance, selectedPlaylistId, selectedPlaylistTracks, MUT } = useMusic();
+    const { musicKitInstance, selectedPlaylistId, selectedPlaylistTracks, MUT, gameMode } = useMusic();
     const [searchQuery, setSearchQuery] = useState('');
     const [songs, setSongs] = useState([]);
     const [shuffledQueue, setShuffledQueue] = useState([]);
@@ -67,8 +67,14 @@ const Game = () => {
     }
 
     const addTime = () => {
-        if (playTime < 10000) {
-            setPlayTime(playTime + 1000);
+        if (gameMode === 1) {
+            if (playTime < 10000) {
+                setPlayTime(playTime + 1000);
+            }
+        } else if (gameMode === 2) {
+            if (playTime < 3000) {
+                setPlayTime(playTime + 2000);
+            }
         }
     }
 
@@ -112,67 +118,98 @@ const Game = () => {
     );
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 pt-20 relative">
-          <h2 className="text-3xl font-semibold">Guess the Song</h2>
-            {/* Play Button */}
-            <button 
-                className="button is-success is-fullwidth"
-                onClick={play}
-            >Play</button>
+  <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-600 pt-20 relative">
+    <h2 className="text-3xl font-semibold">Guess the Song</h2>
+    
+    {/* Play Button and Play Time on the Same Line */}
+    <div className="flex items-center gap-4 mt-4">
+      <button
+        onClick={play}
+        className="flex items-center justify-center px-5 py-2 bg-green-500 text-white rounded-full shadow hover:bg-green-600 transition"
+        style={{
+          fontSize: '18px',
+          fontWeight: 'bold',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px', // Spacing between icon and text
+        }}
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          fill="currentColor" 
+          viewBox="0 0 16 16"
+          style={{ marginRight: '8px' }}  // Optional spacing adjustment
+        >
+          <path d="M10.804 8 5.198 3.5v9L10.804 8z"/>
+        </svg>
+        Play
+      </button>
 
-            {/* Add Time Button */}
-            <button 
-                className="button is-success is-fullwidth"
-                onClick={addTime}
-            >Add Time</button>
+      <p style={{ fontSize: '18px', lineHeight: '1.6', color: 'white' }}>
+        {playTime / 1000} {playTime / 1000 === 1 ? 'second' : 'seconds'}
+      </p>
 
-            {/* Search Bar */}
-            <input 
-                type="text"
-                placeholder='Search for a song...'
-                value={searchQuery}
-                onChange={handleInputChange}
-                className='border border-gray-300 rounded p-2 mr-2'
-            />
+        {/* Add Time Button */}
+        <button
+        onClick={addTime}
+        className="px-3 py-2 mt-3 bg-blue-700 text-white font-semibold rounded-full shadow hover:bg-blue-800 transition"
+        >
+        Add Time
+        </button>
+    </div>  
 
-            {/* Song Buttons */}
-            {searchQuery && filteredSongs.length > 0 && (
-                <div 
-                    id="itemList" 
-                    style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '10px', 
-                        marginTop: '10px',
-                        maxHeight: '150px', // Set the height limit for the box
-                        overflowY: 'auto', // Enable vertical scrolling
-                        border: '1px solid #ccc', // Optional: add a border to the box
-                        padding: '10px', // Optional: add some padding
-                        borderRadius: '5px' // Optional: rounded corners
-                    }}
-                >   
-                    {filteredSongs
-                    .sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
-                    .map((song, index) => (
-                    <button
-                        key={`${song.id}-${index}`}
-                        data-id={song.id}
-                        className="button is-small is-focused is-dark is-link"
-                        onClick={() => handleGuess(song)}
-                        style={{ padding: '8px 12px', textAlign: 'center' }}
-                    >
-                        {song.attributes.name}
-                    </button>
-                    ))}
-                </div>
-            )}
+    {/* Search Bar */}
+    <input
+      type="text"
+      placeholder='Search for a song...'
+      value={searchQuery}
+      onChange={handleInputChange}
+      className='border border-gray-300 rounded p-2 mt-5 w-64'
+    />
 
-            {/* no results */}
-            {searchQuery && filteredSongs.length === 0 && (
-                <p>No results found for "{searchQuery}".</p>
-            )}
-        </div>
-    );
+    {/* Song Buttons */}
+    {searchQuery && filteredSongs.length > 0 && (
+      <div 
+        id="itemList" 
+        style={{ 
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: '10px',
+          marginTop: '10px',
+          maxHeight: '150px',
+          overflowY: 'auto',
+          border: '1px solid #ccc',
+          padding: '10px',
+          borderRadius: '5px',
+          width: '300px'
+        }}
+      >   
+        {filteredSongs
+          .sort((a, b) => a.attributes.name.localeCompare(b.attributes.name))
+          .map((song, index) => (
+            <button
+              key={`${song.id}-${index}`}
+              data-id={song.id}
+              className="button is-small is-focused is-dark is-link"
+              onClick={() => handleGuess(song)}
+              style={{ padding: '8px 12px', textAlign: 'center', flex: '1 0 45%' }}
+            >
+              {song.attributes.name}
+            </button>
+          ))}
+      </div>
+    )}
+
+    {/* No Results */}
+    {searchQuery && filteredSongs.length === 0 && (
+      <p className="mt-3 text-white">No results found for "{searchQuery}".</p>
+    )}
+  </div>
+);
+
 };
 
 export default Game;

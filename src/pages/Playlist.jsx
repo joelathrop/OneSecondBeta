@@ -8,7 +8,7 @@ import { GiConsoleController } from 'react-icons/gi';
 
 const Playlist = () => {
   const[searchQuery, setSearchQuery] = useState('');
-  const { MUT, setAllPlaylists, allPlaylists, selectedPlaylistId, setSelectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks } = useMusic();
+  const { MUT, setAllPlaylists, allPlaylists, selectedPlaylistId, setSelectedPlaylistId, selectedPlaylistTracks, setSelectedPlaylistTracks, gameMode } = useMusic();
   const developerToken = import.meta.env.VITE_DEVELOPER_TOKEN;
   const playlistsURL = 'https://api.music.apple.com/v1/me/library/playlists?limit=100';
   const offsetRef = useRef(0);
@@ -19,6 +19,7 @@ const Playlist = () => {
   // mount playlists route
   useEffect (() => {
     console.log('navigated to playlists page');
+    console.log('gamemode:', gameMode);
 
     setSelectedPlaylistTracks([]);
     fetchPlaylists();
@@ -157,7 +158,22 @@ const Playlist = () => {
       />
 
       {/* Playlist Buttons */}
-      <div id="itemList" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '10px' }}>
+      <div 
+        id="itemList" 
+        style={{ 
+          display: 'flex', 
+          flexDirection: 'row', // Set to row to allow wrapping into columns
+          flexWrap: 'wrap', // Allow wrapping to create multiple columns
+          gap: '10px', 
+          width: '500px',
+          marginTop: '10px',
+          maxHeight: '150px', // Fixed height
+          overflowY: 'auto', // Enable vertical scrolling
+          border: '1px solid #ccc', // Optional: border for the box
+          padding: '10px', // Optional: padding inside the box
+          borderRadius: '5px' // Optional: rounded corners
+        }}
+          >
         {filteredPlaylists.map((playlist) => (
           <button
           key={playlist.id}
@@ -167,7 +183,11 @@ const Playlist = () => {
             setSelectedPlaylistId(playlist.id); 
             fetchPlaylistSongs(playlist.id);
           }}
-          style={{ padding: '8px 12px', textAlign: 'center' }}
+          style={{ 
+            width: 'calc(50% - 5px)', // Width for two columns with gap
+            padding: '8px 12px', 
+            textAlign: 'center' 
+          }}
         >
           {playlist.attributes.name}
         </button>

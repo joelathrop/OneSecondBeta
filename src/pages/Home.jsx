@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 /////////////////////////
 // set everything back to session storage?
 // easter eggs when users route to places they can't get to?
+// set playlist to session/local storage so it doesn't go away on refresh
 
 const Home = () => {
   const { musicKitInstance, setMUT, MUT, gameMode, setGameMode } = useMusic();
