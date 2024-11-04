@@ -154,7 +154,7 @@ const Game = () => {
         {/* Add Time Button */}
         <button
             onClick={addTime}
-            className="flex items-center justify-center px-3 py-2 mt-3 bg-blue-700 text-white font-semibold rounded-full shadow hover:bg-blue-800 transition"
+            className="flex items-center justify-center px-3 py-2 bg-blue-700 text-white font-semibold rounded-full shadow hover:bg-blue-800 transition"
             style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -162,6 +162,8 @@ const Game = () => {
         >
         Add Time
         </button>
+
+        
     </div>  
 
     {/* Search Bar */}
